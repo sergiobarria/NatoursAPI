@@ -1,0 +1,7 @@
+@NatoursApi_HostAddress = https://localhost:7001
+
+GET {{NatoursApi_HostAddress}}/api/v1.0/tours/
+Accept: application/json
+
+###
+GET {{NatoursApi_HostAddress}}/healthz
