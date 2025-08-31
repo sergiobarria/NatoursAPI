@@ -1,9 +1,10 @@
 using System.Text.Json;
 using Asp.Versioning;
+using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
+using NatoursApi.Endpoints.V2;
+using NatoursApi.Exceptions;
 using NatoursApi.Extensions;
-using NatoursApi.Features.Tours.v2;
-using NatoursApi.Middleware;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,9 +17,11 @@ builder.Services
     .ConfigureOpenApi()
     .ConfigureApiVersioning()
     .ConfigureAppDbContext(builder.Configuration)
-    .ConfigureMapping()
-    .ConfigureAppServices();
+    .ConfigureMapping();
 
+builder.Services.AddAppServices();
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, includeInternalTypes: true);
+builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

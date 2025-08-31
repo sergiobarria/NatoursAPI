@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Reflection;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
@@ -7,7 +6,8 @@ using Mapster;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using NatoursApi.Data;
-using NatoursApi.Features.Tours.v1;
+using NatoursApi.Services.Abstractions;
+using NatoursApi.Services.Implementations;
 using Scalar.AspNetCore;
 
 namespace NatoursApi.Extensions;
@@ -50,37 +50,12 @@ public static class ServiceExtensions
 
     public static IServiceCollection ConfigureProblemDetails(this IServiceCollection services)
     {
-        services.AddProblemDetails(options =>
+        services.AddProblemDetails(configure =>
         {
-            options.CustomizeProblemDetails = context =>
+            configure.CustomizeProblemDetails = context =>
             {
-                var http = context.HttpContext;
-                context.ProblemDetails.Extensions["traceId"] =
-                    Activity.Current?.Id ?? http.TraceIdentifier;
-                context.ProblemDetails.Extensions["support"] = "support@example.com";
-
-                switch (context.ProblemDetails.Status)
-                {
-                    case StatusCodes.Status401Unauthorized:
-                        context.ProblemDetails.Title = "Unauthorized";
-                        context.ProblemDetails.Detail ??= "You do not have permission to access this resource.";
-                        break;
-
-                    case StatusCodes.Status404NotFound:
-                        context.ProblemDetails.Title = "Resource Not Found";
-                        context.ProblemDetails.Detail ??= "The requested resource was not found.";
-                        break;
-
-                    case StatusCodes.Status500InternalServerError:
-                        context.ProblemDetails.Title = "Internal Server Error";
-                        context.ProblemDetails.Detail ??= "Something went wrong. Please try again later.";
-                        break;
-
-                    case null:
-                        context.ProblemDetails.Title = "Internal Server Error";
-                        context.ProblemDetails.Status = StatusCodes.Status500InternalServerError;
-                        break;
-                }
+                context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+                context.ProblemDetails.Extensions.TryAdd("support", "support@example.com");
             };
         });
 
@@ -122,8 +97,6 @@ public static class ServiceExtensions
                             Window = TimeSpan.FromMinutes(1)
                         })
                 );
-
-            // opts.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
             opts.AddPolicy("RegisterPolicy", context => RateLimitPartition.GetFixedWindowLimiter("RegisterLimiter",
                 partition => new FixedWindowRateLimiterOptions
@@ -203,12 +176,10 @@ public static class ServiceExtensions
         });
     }
 
-    public static IServiceCollection ConfigureAppServices(this IServiceCollection services)
+    public static void AddAppServices(this IServiceCollection services)
     {
         services.AddScoped<ITourService, TourService>();
         // Add other app services...
-
-        return services;
     }
 
     public static IServiceCollection ConfigureMapping(this IServiceCollection services)

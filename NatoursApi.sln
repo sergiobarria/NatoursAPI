@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NatoursApi.Domain", "Natour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NatoursApi.Data", "NatoursApi.Data\NatoursApi.Data.csproj", "{43651A40-34E0-4968-8643-3E471B339B12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NatoursApi.Services", "NatoursApi.Services\NatoursApi.Services.csproj", "{86327E1D-C4D3-4B54-84FC-503D2AC640FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{43651A40-34E0-4968-8643-3E471B339B12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43651A40-34E0-4968-8643-3E471B339B12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43651A40-34E0-4968-8643-3E471B339B12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86327E1D-C4D3-4B54-84FC-503D2AC640FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86327E1D-C4D3-4B54-84FC-503D2AC640FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86327E1D-C4D3-4B54-84FC-503D2AC640FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86327E1D-C4D3-4B54-84FC-503D2AC640FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,6 +1,6 @@
-namespace NatoursApi.Features.Tours.v2;
+namespace NatoursApi.Endpoints.V2;
 
-public static class ToursEndpoints
+public static class TourEndpoints
 {
     public static void MapToursEndpoints(this IEndpointRouteBuilder app)
     {

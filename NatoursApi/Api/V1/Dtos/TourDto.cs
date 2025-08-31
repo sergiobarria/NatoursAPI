@@ -1,4 +1,4 @@
-namespace NatoursApi.Features.Tours.v1;
+namespace NatoursApi.Controllers.V1.Dtos;
 
 public record TourDto(
     Guid Id,

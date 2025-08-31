@@ -11,6 +11,8 @@
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0"/>
         <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0"/>
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0"/>
+        <PackageReference Include="FluentValidation" Version="12.0.0"/>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0"/>
         <PackageReference Include="Mapster" Version="7.4.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
@@ -22,6 +24,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.8"/>
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0"/>
         <PackageReference Include="Scalar.AspNetCore" Version="2.7.2"/>
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0"/>
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
@@ -31,10 +34,11 @@
     <ItemGroup>
         <ProjectReference Include="..\NatoursApi.Data\NatoursApi.Data.csproj"/>
         <ProjectReference Include="..\NatoursApi.Domain\NatoursApi.Domain.csproj"/>
+        <ProjectReference Include="..\NatoursApi.Services\NatoursApi.Services.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Configuration\"/>
+        <Folder Include="Api\V2\TourStartDates\"/>
         <Folder Include="wwwroot\"/>
     </ItemGroup>
 
