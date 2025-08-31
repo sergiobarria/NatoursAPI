@@ -1,6 +1,6 @@
 namespace NatoursApi.Api.V1.Dtos;
 
-public record CreateTourDto(
+public record UpdateTourDto(
     string Name,
     int Duration,
     int MaxGroupSize,

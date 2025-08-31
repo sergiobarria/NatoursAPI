@@ -6,6 +6,7 @@ using Mapster;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using NatoursApi.Data;
+using NatoursApi.Data.Interceptors;
 using NatoursApi.Services.Abstractions;
 using NatoursApi.Services.Implementations;
 using Scalar.AspNetCore;
@@ -19,7 +20,8 @@ public static class ServiceExtensions
     {
         services.AddDbContext<ApplicationDbContext>(opts =>
         {
-            opts.UseNpgsql(configuration.GetConnectionString("Default"));
+            opts.UseNpgsql(configuration.GetConnectionString("Default"))
+                .AddInterceptors(new AuditLogsInterceptor());
         });
 
         return services;

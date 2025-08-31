@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NatoursApi.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NatoursApi.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250831183009_AuditLogs")]
+    partial class AuditLogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +58,7 @@ namespace NatoursApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AuditLogs", (string)null);
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("NatoursApi.Domain.Entities.Tour", b =>
@@ -117,7 +120,7 @@ namespace NatoursApi.Data.Migrations
 
                     b.HasIndex("Price", "RatingsAverage");
 
-                    b.ToTable("Tours", (string)null);
+                    b.ToTable("Tours");
                 });
 
             modelBuilder.Entity("NatoursApi.Domain.Entities.TourStartDate", b =>
@@ -137,7 +140,7 @@ namespace NatoursApi.Data.Migrations
                     b.HasIndex("TourId", "Date")
                         .IsUnique();
 
-                    b.ToTable("TourStartDates", (string)null);
+                    b.ToTable("TourStartDates");
                 });
 
             modelBuilder.Entity("NatoursApi.Domain.Entities.TourStartDate", b =>

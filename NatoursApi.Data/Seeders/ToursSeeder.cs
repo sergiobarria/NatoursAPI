@@ -51,7 +51,7 @@ public static class ToursSeeder
             foreach (var item in items)
             {
                 logger.LogInformation("TourSeeder: Adding tour {TourName}", item.Name);
-                var id = Guid.NewGuid();
+                var id = Guid.CreateVersion7();
                 var name = item.Name.Trim();
 
                 var tour = new Tour
@@ -79,7 +79,7 @@ public static class ToursSeeder
                 var generated = GenerateStartDatesUtc(random, 3, 5, 365);
                 startDates.AddRange(generated.Select(d => new TourStartDate
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.CreateVersion7(),
                     TourId = id,
                     Date = d
                 }));

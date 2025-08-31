@@ -1,5 +1,5 @@
 using FluentValidation;
-using NatoursApi.Controllers.V1.Dtos;
+using NatoursApi.Api.V1.Dtos;
 
 namespace NatoursApi.Controllers.V1.Validators;
 

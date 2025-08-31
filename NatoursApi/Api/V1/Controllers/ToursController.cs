@@ -2,7 +2,8 @@ using Asp.Versioning;
 using FluentValidation;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
-using NatoursApi.Controllers.V1.Dtos;
+using NatoursApi.Api.V1.Dtos;
+using NatoursApi.Domain.Entities;
 using NatoursApi.Services.Abstractions;
 
 namespace NatoursApi.Api.V1.Controllers;
@@ -22,7 +23,7 @@ public class ToursController(ITourService tourService) : ControllerBase
         return Ok(tours);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "GetTour")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TourDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TourDto>> GetTourById(Guid id, CancellationToken ct)
@@ -34,22 +35,43 @@ public class ToursController(ITourService tourService) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<string>> CreateTour(CreateTourDto newTour, IValidator<CreateTourDto> validator)
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(TourDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<string>> CreateTour(CreateTourDto newTourDto, IValidator<CreateTourDto> validator,
+        CancellationToken ct)
     {
-        await validator.ValidateAndThrowAsync(newTour);
+        await validator.ValidateAndThrowAsync(newTourDto, ct);
 
-        return Created("/api/v1/tours", newTour);
+        var tourEntity = newTourDto.Adapt<Tour>();
+        var newTour = await tourService.CreateAsync(tourEntity, ct);
+        var tourDto = newTour.Adapt<TourDto>();
+
+        return CreatedAtAction(nameof(GetTourById), new { id = tourDto.Id, version = "1.0" }, tourDto);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<TourDto>> UpdateTour(Guid? id, string? name, CancellationToken ct)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TourDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<TourDto>> UpdateTour(Guid id, UpdateTourDto updateTourDto,
+        IValidator<UpdateTourDto> validator, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        await validator.ValidateAndThrowAsync(updateTourDto, ct);
+
+        var updatedTourEntity = updateTourDto.Adapt<Tour>();
+        var updatedTour = await tourService.UpdateAsync(id, updatedTourEntity, ct);
+
+        var updatedTourDto = updatedTour.Adapt<TourDto>();
+
+        return Ok(updatedTourDto);
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult<TourDto>> DeleteTour(Guid? id, CancellationToken ct)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TourDto>> DeleteTour(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        await tourService.DeleteAsync(id, ct);
+        return NoContent();
     }
 }

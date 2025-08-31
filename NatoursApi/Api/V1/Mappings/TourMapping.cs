@@ -1,7 +1,7 @@
 using Mapster;
 using NatoursApi.Domain.Entities;
 
-namespace NatoursApi.Controllers.V1.Mappings;
+namespace NatoursApi.Api.V1.Mappings;
 
 public class TourMapping : IRegister
 {
