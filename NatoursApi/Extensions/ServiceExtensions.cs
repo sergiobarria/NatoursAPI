@@ -174,7 +174,7 @@ public static class ServiceExtensions
                 .WithSidebar()
                 .WithDarkMode()
                 .WithTheme(ScalarTheme.DeepSpace)
-                .WithDefaultOpenAllTags();
+                .WithDefaultOpenAllTags(false);
         });
     }
 
