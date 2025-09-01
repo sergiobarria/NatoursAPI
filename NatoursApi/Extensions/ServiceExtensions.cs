@@ -174,13 +174,14 @@ public static class ServiceExtensions
                 .WithSidebar()
                 .WithDarkMode()
                 .WithTheme(ScalarTheme.DeepSpace)
-                .WithDefaultOpenAllTags();
+                .WithDefaultOpenAllTags(false);
         });
     }
 
     public static void AddAppServices(this IServiceCollection services)
     {
         services.AddScoped<ITourService, TourService>();
+        services.AddScoped<ITourStartDateService, TourStartDateService>();
         // Add other app services...
     }
 

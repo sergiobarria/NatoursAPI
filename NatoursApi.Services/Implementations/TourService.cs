@@ -27,7 +27,7 @@ public class TourService(ApplicationDbContext context) : ITourService
             .Include(t => t.StartDates)
             .FirstOrDefaultAsync(t => t.Id.Equals(id), ct);
 
-        if (tour is null) throw new NotFoundException("Tour", id);
+        if (tour is null) throw new NotFoundException($"Tour with id {id} not found.");
 
         return tour;
     }
@@ -45,7 +45,7 @@ public class TourService(ApplicationDbContext context) : ITourService
     public async Task<Tour> UpdateAsync(Guid id, Tour updatedTour, CancellationToken ct)
     {
         var tour = await context.Tours.FirstOrDefaultAsync(t => t.Id.Equals(id), ct);
-        if (tour is null) throw new NotFoundException("Tour", id);
+        if (tour is null) throw new NotFoundException($"Tour with id {id} not found.");
 
         if (tour.Name != updatedTour.Name)
         {
@@ -75,7 +75,7 @@ public class TourService(ApplicationDbContext context) : ITourService
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
         var tourToDelete = await context.Tours.FindAsync([id], ct);
-        if (tourToDelete is null) throw new NotFoundException("Tour", id);
+        if (tourToDelete is null) throw new NotFoundException($"Tour with id {id} not found.");
 
         context.Tours.Remove(tourToDelete);
         await context.SaveChangesAsync(ct);
