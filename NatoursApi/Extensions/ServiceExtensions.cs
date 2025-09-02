@@ -77,6 +77,9 @@ public static class ServiceExtensions
             .AddNpgSql(connectionString)
             .AddDbContextCheck<ApplicationDbContext>();
 
+        services.AddHealthChecksUI()
+            .AddInMemoryStorage();
+
         return services;
     }
 
@@ -86,6 +89,8 @@ public static class ServiceExtensions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
+
+        app.MapHealthChecksUI();
     }
 
     public static IServiceCollection ConfigureRateLimitingOptions(this IServiceCollection services)
