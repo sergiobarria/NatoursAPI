@@ -13,7 +13,7 @@ namespace NatoursApi.Api.V1.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/tours")]
 [ApiVersion(1.0)]
-public class ToursController(ITourService tourService, IDataShaper<TourDto> dataShaper, ILogger<ToursController> logger)
+public class ToursController(ITourService tourService, IDataShaper<TourDto> dataShaper)
     : ControllerBase
 {
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
@@ -23,6 +23,7 @@ public class ToursController(ITourService tourService, IDataShaper<TourDto> data
     };
 
     [HttpGet]
+    [HttpHead]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TourDto>))]
     public async Task<ActionResult<List<TourDto>>> GetTours([FromQuery] TourQueryParameters queryParameters,
         CancellationToken ct)
@@ -86,5 +87,13 @@ public class ToursController(ITourService tourService, IDataShaper<TourDto> data
     {
         await tourService.DeleteAsync(id, ct);
         return NoContent();
+    }
+
+    [HttpOptions]
+    public ActionResult GetToursOptions()
+    {
+        Response.Headers.Append("Allow", "GET, POST, PUT, DELETE");
+
+        return Ok();
     }
 }
