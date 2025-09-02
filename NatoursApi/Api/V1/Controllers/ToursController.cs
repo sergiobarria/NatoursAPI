@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Asp.Versioning;
 using FluentValidation;
 using Mapster;
@@ -5,22 +6,34 @@ using Microsoft.AspNetCore.Mvc;
 using NatoursApi.Api.V1.Dtos;
 using NatoursApi.Domain.Entities;
 using NatoursApi.Services.Abstractions;
+using Shared.RequestFeatures;
 
 namespace NatoursApi.Api.V1.Controllers;
 
 [ApiController]
 [Route("api/v{version:apiVersion}/tours")]
 [ApiVersion(1.0)]
-public class ToursController(ITourService tourService) : ControllerBase
+public class ToursController(ITourService tourService, IDataShaper<TourDto> dataShaper, ILogger<ToursController> logger)
+    : ControllerBase
 {
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
+
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TourDto>))]
-    public async Task<ActionResult<List<TourDto>>> GetTours(CancellationToken ct)
+    public async Task<ActionResult<List<TourDto>>> GetTours([FromQuery] TourQueryParameters queryParameters,
+        CancellationToken ct)
     {
-        var entities = await tourService.GetAllAsync(ct);
-        var tours = entities.Adapt<List<TourDto>>();
+        var entities = await tourService.GetAllAsync(queryParameters, ct);
 
-        return Ok(tours);
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(entities.Metadata, JsonSerializerOptions));
+        var tours = entities.Items.Adapt<List<TourDto>>();
+        var shapedData = dataShaper.ShapeData(tours, queryParameters.Fields!);
+
+        return Ok(shapedData);
     }
 
     [HttpGet("{id:guid}", Name = "GetTour")]

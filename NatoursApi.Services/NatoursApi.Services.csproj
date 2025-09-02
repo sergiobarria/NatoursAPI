@@ -9,6 +9,11 @@
     <ItemGroup>
         <ProjectReference Include="..\NatoursApi.Data\NatoursApi.Data.csproj"/>
         <ProjectReference Include="..\NatoursApi.Domain\NatoursApi.Domain.csproj"/>
+        <ProjectReference Include="..\Shared\Shared.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Linq.Dynamic.Core"/>
     </ItemGroup>
 
 </Project>

@@ -5,9 +5,11 @@ using HealthChecks.UI.Client;
 using Mapster;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using NatoursApi.Api.V1.Dtos;
 using NatoursApi.Data;
 using NatoursApi.Data.Interceptors;
 using NatoursApi.Services.Abstractions;
+using NatoursApi.Services.DataShaping;
 using NatoursApi.Services.Implementations;
 using Scalar.AspNetCore;
 
@@ -39,11 +41,13 @@ public static class ServiceExtensions
                     builder.WithOrigins(origins)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowCredentials();
+                        .AllowCredentials()
+                        .WithExposedHeaders("X-Pagination");
                 else
                     builder.AllowAnyOrigin()
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .WithExposedHeaders("X-Pagination");
             });
         });
 
@@ -182,6 +186,7 @@ public static class ServiceExtensions
     {
         services.AddScoped<ITourService, TourService>();
         services.AddScoped<ITourStartDateService, TourStartDateService>();
+        services.AddScoped<IDataShaper<TourDto>, DataShaper<TourDto>>();
         // Add other app services...
     }
 

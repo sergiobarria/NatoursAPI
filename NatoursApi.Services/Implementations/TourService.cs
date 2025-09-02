@@ -4,20 +4,37 @@ using NatoursApi.Data;
 using NatoursApi.Domain.Entities;
 using NatoursApi.Domain.Exceptions;
 using NatoursApi.Services.Abstractions;
+using NatoursApi.Services.Extensions;
+using Shared.RequestFeatures;
 
 namespace NatoursApi.Services.Implementations;
 
 public class TourService(ApplicationDbContext context) : ITourService
 {
-    public async Task<IEnumerable<Tour>> GetAllAsync(CancellationToken ct)
+    public async Task<PagedList<Tour>> GetAllAsync(TourQueryParameters queryParameters, CancellationToken ct)
     {
-        var tours = await context.Tours
-            .AsNoTracking()
-            .Include(t => t.StartDates)
-            .OrderBy(t => t.Name)
+        var query = context.Tours.AsNoTracking()
+            .IncludeRelations(queryParameters.Includes)
+            .FilterByName(queryParameters.Name)
+            .FilterBySlug(queryParameters.Slug)
+            .FilterByPriceRange(queryParameters.MinPrice, queryParameters.MaxPrice)
+            .FilterByMaxGroupSize(queryParameters.MinGroupSize, queryParameters.MaxGroupSize)
+            .Sort(queryParameters.OrderBy!);
+
+        var tours = await query
+            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
+            .Take(queryParameters.PageSize)
             .ToListAsync(ct);
 
-        return tours;
+        var totalItemCount = await query.CountAsync(ct);
+
+        var metadata = new PaginationMetadata(totalItemCount, queryParameters.PageNumber, queryParameters.PageSize);
+
+        return new PagedList<Tour>
+        {
+            Items = tours,
+            Metadata = metadata
+        };
     }
 
     public async Task<Tour> GetByIdAsync(Guid id, CancellationToken ct)
@@ -44,8 +61,7 @@ public class TourService(ApplicationDbContext context) : ITourService
 
     public async Task<Tour> UpdateAsync(Guid id, Tour updatedTour, CancellationToken ct)
     {
-        var tour = await context.Tours.FirstOrDefaultAsync(t => t.Id.Equals(id), ct);
-        if (tour is null) throw new NotFoundException($"Tour with id {id} not found.");
+        var tour = await GetTourAndCheckIfExists(id, ct);
 
         if (tour.Name != updatedTour.Name)
         {
@@ -74,11 +90,18 @@ public class TourService(ApplicationDbContext context) : ITourService
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var tourToDelete = await context.Tours.FindAsync([id], ct);
-        if (tourToDelete is null) throw new NotFoundException($"Tour with id {id} not found.");
+        var tourToDelete = await GetTourAndCheckIfExists(id, ct);
 
         context.Tours.Remove(tourToDelete);
         await context.SaveChangesAsync(ct);
+    }
+
+    private async Task<Tour> GetTourAndCheckIfExists(Guid id, CancellationToken ct)
+    {
+        var tour = await context.Tours.FirstOrDefaultAsync(t => t.Id.Equals(id), ct);
+        if (tour is null) throw new NotFoundException($"Tour with id {id} not found.");
+
+        return tour;
     }
 
     private static string Slugify(string value)

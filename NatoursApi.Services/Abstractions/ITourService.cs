@@ -1,10 +1,11 @@
 using NatoursApi.Domain.Entities;
+using Shared.RequestFeatures;
 
 namespace NatoursApi.Services.Abstractions;
 
 public interface ITourService
 {
-    Task<IEnumerable<Tour>> GetAllAsync(CancellationToken ct);
+    Task<PagedList<Tour>> GetAllAsync(TourQueryParameters queryParameters, CancellationToken ct);
 
     Task<Tour> GetByIdAsync(Guid id, CancellationToken ct);
 
