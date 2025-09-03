@@ -4,10 +4,12 @@ using Asp.Versioning;
 using HealthChecks.UI.Client;
 using Mapster;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NatoursApi.Api.V1.Dtos;
 using NatoursApi.Data;
 using NatoursApi.Data.Interceptors;
+using NatoursApi.Domain.Entities;
 using NatoursApi.Services.Abstractions;
 using NatoursApi.Services.DataShaping;
 using NatoursApi.Services.Implementations;
@@ -198,6 +200,23 @@ public static class ServiceExtensions
     public static IServiceCollection ConfigureMapping(this IServiceCollection services)
     {
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
+
+        return services;
+    }
+
+    public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
+    {
+        services.AddIdentity<ApplicationUser, IdentityRole>(opts =>
+            {
+                opts.Password.RequireDigit = true;
+                opts.Password.RequireLowercase = true;
+                opts.Password.RequireUppercase = true;
+                opts.Password.RequireNonAlphanumeric = false;
+                opts.Password.RequiredLength = 8;
+                opts.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
         return services;
     }

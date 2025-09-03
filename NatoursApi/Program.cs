@@ -17,8 +17,10 @@ builder.Services
     .ConfigureOpenApi()
     .ConfigureApiVersioning()
     .ConfigureAppDbContext(builder.Configuration)
-    .ConfigureMapping();
+    .ConfigureMapping()
+    .ConfigureIdentity();
 
+builder.Services.AddAuthentication();
 builder.Services.AddAppServices();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, includeInternalTypes: true);
 builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
@@ -50,6 +52,7 @@ app.UseStaticFiles();
 app.UseRateLimiter();
 app.UseCors("CorsPolicy");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseApiDocumentation();

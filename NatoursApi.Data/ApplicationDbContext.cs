@@ -1,11 +1,17 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NatoursApi.Data.Seeders;
 using NatoursApi.Domain.Entities;
 
 namespace NatoursApi.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+
     public DbSet<Tour> Tours => Set<Tour>();
 
     public DbSet<TourStartDate> TourStartDates => Set<TourStartDate>();
