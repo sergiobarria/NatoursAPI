@@ -96,6 +96,83 @@ public class TourService(ApplicationDbContext context) : ITourService
         await context.SaveChangesAsync(ct);
     }
 
+    public async Task<IEnumerable<Tour>> GetTopToursAsync(CancellationToken ct)
+    {
+        var query = context.Tours.AsNoTracking()
+            .Sort("ratingsAverage desc, name asc")
+            .Select(t => new Tour
+            {
+                Id = t.Id,
+                Name = t.Name,
+                RatingsAverage = t.RatingsAverage,
+                Price = t.Price,
+                Summary = t.Summary
+            })
+            .Take(5);
+
+        var tours = await query.ToListAsync(ct);
+
+        return tours;
+    }
+
+    public async Task<object> GetTourStatsAsync(CancellationToken ct)
+    {
+        var stats = await context.Tours.AsNoTracking()
+            .Where(t => t.RatingsAverage >= 4.5m)
+            .GroupBy(t => t.Difficulty)
+            .Select(g => new
+            {
+                Difficulty = g.Key.ToString().ToUpper(),
+                NumTours = g.Count(),
+                NumRatings = g.Sum(t => t.RatingsQuantity),
+                AvgRating = g.Average(t => (double)t.RatingsAverage),
+                AvgPrice = g.Average(t => (double)t.Price),
+                MinPrice = g.Min(t => t.Price),
+                MaxPrice = g.Max(t => t.Price)
+            })
+            .OrderBy(s => s.AvgPrice)
+            .ToListAsync(ct);
+
+        return stats;
+    }
+
+    public async Task<object> GetMonthlyPlanAsync(int year, CancellationToken ct)
+    {
+        var startOfYear = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var endOfYear = new DateTime(year, 12, 31, 23, 59, 59, DateTimeKind.Utc);
+
+        var toursWithDates = await context.Tours.AsNoTracking()
+            .Include(t => t.StartDates)
+            .Where(t => t.StartDates.Any(sd => sd.Date >= startOfYear && sd.Date <= endOfYear))
+            .Select(t => new
+            {
+                t.Name,
+                StartDates = t.StartDates.Where(sd => sd.Date >= startOfYear && sd.Date <= endOfYear)
+            })
+            .ToListAsync(ct);
+
+        var monthNames = new[]
+        {
+            "", "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        };
+
+        var plan = toursWithDates
+            .SelectMany(t => t.StartDates, (tour, startDate) => new { tour.Name, StartDate = startDate })
+            .GroupBy(x => x.StartDate.Date.Month)
+            .Select(g => new
+            {
+                Month = monthNames[g.Key],
+                NumTourStarts = g.Count(),
+                Tours = g.Select(x => x.Name).ToList()
+            })
+            .OrderByDescending(x => x.NumTourStarts)
+            .Take(12)
+            .ToList();
+
+        return plan;
+    }
+
     private async Task<Tour> GetTourAndCheckIfExists(Guid id, CancellationToken ct)
     {
         var tour = await context.Tours.FirstOrDefaultAsync(t => t.Id.Equals(id), ct);

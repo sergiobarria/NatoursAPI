@@ -96,4 +96,36 @@ public class ToursController(ITourService tourService, IDataShaper<TourDto> data
 
         return Ok();
     }
+
+    [HttpGet("top")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TourSimpleDto>))]
+    public async Task<ActionResult> GetTopTours(CancellationToken ct)
+    {
+        var entities = await tourService.GetTopToursAsync(ct);
+
+        var tours = entities.Adapt<List<TourDto>>();
+        var shapedData = dataShaper.ShapeData(tours, "name,price,ratingsAverage,summary,difficulty");
+
+        return Ok(shapedData);
+    }
+
+    [HttpGet("stats")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TourStatsDto>))]
+    public async Task<ActionResult> GetTourStats(CancellationToken ct)
+    {
+        var status = await tourService.GetTourStatsAsync(ct);
+        var response = status.Adapt<List<TourStatsDto>>();
+
+        return Ok(response);
+    }
+
+    [HttpGet("plan/{year:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MonthlyPlanDto))]
+    public async Task<ActionResult> GetMonthlyPlan(int year, CancellationToken ct)
+    {
+        var plan = await tourService.GetMonthlyPlanAsync(year, ct);
+        var monthlyPlan = plan.Adapt<MonthlyPlanDto>();
+
+        return Ok(monthlyPlan);
+    }
 }

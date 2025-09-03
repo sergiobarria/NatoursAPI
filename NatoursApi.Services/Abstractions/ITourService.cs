@@ -14,4 +14,10 @@ public interface ITourService
     Task<Tour> UpdateAsync(Guid id, Tour updatedTour, CancellationToken ct);
 
     Task DeleteAsync(Guid id, CancellationToken ct);
+
+    Task<IEnumerable<Tour>> GetTopToursAsync(CancellationToken ct);
+
+    Task<object> GetTourStatsAsync(CancellationToken ct);
+
+    Task<object> GetMonthlyPlanAsync(int year, CancellationToken ct);
 }
